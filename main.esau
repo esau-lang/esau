@@ -1,0 +1,8 @@
+class Person
+{
+    fn __init__(name, age)
+        self.name = name
+        self.age = age
+}
+
+print(attr(Person('Rogers', 18)))
