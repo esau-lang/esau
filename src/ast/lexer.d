@@ -1,7 +1,7 @@
 module LdLexer;
 
 import std.uni;
-import std.conv;
+import std.conv: to;
 import std.range;
 import std.stdio;
 import std.array;
@@ -20,6 +20,8 @@ string meters = "?;,({[]}):.";
 string expr = "=!<>";
 string aliases = "&|";
 string operators = "+-*/%";
+
+enum escaped_keys = ['r':'\r', 't':'\t', 'n':'\n', 'b':'\b', '\\':'\\', '0':'\0', 'a':'\a', 'f':'\f', 'v':'\v', '\'':'\'', '"': '\"', '`':'`', '?': '\?'];
 
 
 class _Lex{
@@ -62,27 +64,15 @@ class _Lex{
 	}
 
 	void rString(){
-		char quot = this.tok;
+		char quot = tok;
 		string str;
-		this.next();
+		next();
 
-		while (this.end && this.tok != quot){
-			if (this.tok == '\\'){
-				this.next();
-				str ~= '\\';
-
-				if (this.end){
-					str ~= this.tok;
-					this.next();
-				}
-
-			} else {
-				str ~= this.tok;
-				this.next();
-			}
+		while (end && tok != quot){
+			str ~= tok;
+			next();
 		}
-
-		this.next();
+		next();
 
 		TOKEN N = {str, "STR", tab, line, loc};
 		TOKENS ~= N;
@@ -113,7 +103,7 @@ class _Lex{
 				_type = "TRUE"; break;
 			case "false":
 				_type = "FALSE"; break;
-			case "null":
+			case "none":
 				_type = "NONE"; break;
 			case "while":
 				_type = "WHILE"; break;
@@ -127,6 +117,8 @@ class _Lex{
 				_type = "BREAK"; break;
 			case "default":
 				_type = "DF"; break;
+			case "pass":
+				_type = "PS"; break;
 			case "try":
 				_type = "TRY"; break;
 			case "except":
@@ -232,15 +224,13 @@ class _Lex{
 		this.next();
 		string hex;
 
-		while (this.end && find("0123456789abcdef", this.tok).length){
+		while (this.end && find("0123456789abcdefABCDEF", this.tok).length){
 			hex ~= this.tok;
 			this.next();
 		}
 
 		this.back();
-
-		long hexed = to!long(hex, 16);
-		return to!string(hexed);
+		return to!string(to!long(hex, 16));
 	}
 
 	string get_exp_num(){
@@ -311,24 +301,21 @@ class _Lex{
 			hex ~= this.tok;
 		}
 
-		return std.range.chunks(hex, 2).map!(i => cast(char)i.to!ubyte(16)).array;
+		return to!string(chunks(hex, 2).map!(i => cast(dchar)i.to!ubyte(16)).array);
 	}
 
 	string get_escaped(){
-		this.next();
-
+		next();
 		string str;
-		char[char] escapes = ['r':'\r', 't':'\t', 'n':'\n', 'b':'\b', '\\':'\\', '0':'\0', 'a':'\a', 'f':'\f', 'v':'\v', '\'':'\'', '"': '\"', '`':'`', '?': '\?'];
 
-		if (this.end) {
-			if (find("rtnb0afv?\\'\"", this.tok).length)
-				return (str ~ escapes[this.tok]);
+		if (end) {
+			if (find("rtnb0afv?\\'\"", tok).length)
+				str ~= escaped_keys[tok];
 
-			else if (this.tok == 'x')
-				return get_hex_unicode();
+			else if (tok == 'x')
+				str = get_hex_unicode();
 		}
-
-		return "";
+		return str;
 	}
 
 	string lex_string(){
@@ -337,7 +324,7 @@ class _Lex{
 		string str, chars;
 		this.next();
 
-		while (this.end && this.tok != quot && this.tok){
+		while (end && tok != quot && tok){
 			if (this.tok == '\\')
 				str ~= get_escaped();
 			else 

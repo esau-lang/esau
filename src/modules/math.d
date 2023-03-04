@@ -5,7 +5,6 @@ import core.stdc.math;
 import LdObject;
 
 
-
 class oMath: LdOBJECT {
 	LdOBJECT[string] props;
 
@@ -71,7 +70,7 @@ class Ldexp: LdOBJECT
         return new LdNum(ldexp(args[0].__num__, cast(int)args[1].__num__));
     }
 
-    override string __str__() { return "ldexp (math method)"; }
+    override string __str__() { return "math.ldexp (method)"; }
 }
 
 class Modf: LdOBJECT
@@ -81,7 +80,7 @@ class Modf: LdOBJECT
         return new LdNum(modf(args[0].__num__, &x));
     }
 
-    override string __str__() { return "modf (math method)"; }
+    override string __str__() { return "math.modf (method)"; }
 }
 
 class Hypot: LdOBJECT
@@ -90,7 +89,7 @@ class Hypot: LdOBJECT
         return new LdNum(hypot(args[0].__num__, args[1].__num__));
     }
 
-    override string __str__() { return "hypot (math method)"; }
+    override string __str__() { return "math.hypot (method)"; }
 }
 
 class Frexp: LdOBJECT
@@ -100,7 +99,7 @@ class Frexp: LdOBJECT
         return new LdNum(frexp(args[0].__num__, &x));
     }
 
-    override string __str__() { return "frexp (math method)"; }
+    override string __str__() { return "math.frexp (method)"; }
 }
 
 class Fmod: LdOBJECT
@@ -109,7 +108,7 @@ class Fmod: LdOBJECT
         return new LdNum(fmod(args[0].__num__, args[1].__num__));
     }
 
-    override string __str__() { return "fmod (math method)"; }
+    override string __str__() { return "math.fmod (method)"; }
 }
 
 class Expm1: LdOBJECT
@@ -118,7 +117,7 @@ class Expm1: LdOBJECT
         return new LdNum(expm1(args[0].__num__));
     }
 
-    override string __str__() { return "expm1 (math method)"; }
+    override string __str__() { return "math.expm1 (method)"; }
 }
 
 class Erf: LdOBJECT
@@ -127,7 +126,7 @@ class Erf: LdOBJECT
         return new LdNum(erf(args[0].__num__));
     }
 
-    override string __str__() { return "erf (math method)"; }
+    override string __str__() { return "math.erf (method)"; }
 }
 
 class Erfc: LdOBJECT
@@ -136,7 +135,7 @@ class Erfc: LdOBJECT
         return new LdNum(erfc(args[0].__num__));
     }
 
-    override string __str__() { return "erfc (math method)"; }
+    override string __str__() { return "math.erfc (method)"; }
 }
 
 class Copysign: LdOBJECT
@@ -145,7 +144,7 @@ class Copysign: LdOBJECT
         return new LdNum(copysign(args[0].__num__, args[1].__num__));
     }
 
-    override string __str__() { return "copysign (math method)"; }
+    override string __str__() { return "math.copysign (method)"; }
 }
 
 class Trunc: LdOBJECT
@@ -154,7 +153,7 @@ class Trunc: LdOBJECT
         return new LdNum(trunc(args[0].__num__));
     }
 
-    override string __str__() { return "trunc (math method)"; }
+    override string __str__() { return "math.trunc (method)"; }
 }
 
 class Lgamma: LdOBJECT
@@ -163,7 +162,7 @@ class Lgamma: LdOBJECT
         return new LdNum(lgamma(args[0].__num__));
     }
 
-    override string __str__() { return "lgamma (math method)"; }
+    override string __str__() { return "math.lgamma (method)"; }
 }
 
 class Exp: LdOBJECT
@@ -172,7 +171,7 @@ class Exp: LdOBJECT
         return new LdNum(exp(args[0].__num__));
     }
 
-    override string __str__() { return "exp (math method)"; }
+    override string __str__() { return "math.exp (method)"; }
 }
 
 class Remainder: LdOBJECT
@@ -181,7 +180,7 @@ class Remainder: LdOBJECT
         return new LdNum(remainder(args[0].__num__, args[1].__num__));
     }
 
-    override string __str__() { return "remainder (math method)"; }
+    override string __str__() { return "math.remainder (method)"; }
 }
 
 class Log1p: LdOBJECT
@@ -190,7 +189,7 @@ class Log1p: LdOBJECT
         return new LdNum(log1p(args[0].__num__));
     }
 
-    override string __str__() { return "log1p (math method)"; }
+    override string __str__() { return "math.log1p (method)"; }
 }
 
 class Log2: LdOBJECT
@@ -199,7 +198,7 @@ class Log2: LdOBJECT
         return new LdNum(log2(args[0].__num__));
     }
 
-    override string __str__() { return "log2 (math method)"; }
+    override string __str__() { return "math.log2 (method)"; }
 }
 
 class Log10: LdOBJECT
@@ -208,7 +207,7 @@ class Log10: LdOBJECT
         return new LdNum(log10(args[0].__num__));
     }
 
-    override string __str__() { return "log10 (math method)"; }
+    override string __str__() { return "math.log10 (method)"; }
 }
 
 class Log: LdOBJECT
@@ -217,7 +216,7 @@ class Log: LdOBJECT
         return new LdNum(log(args[0].__num__));
     }
 
-    override string __str__() { return "log (math method)"; }
+    override string __str__() { return "math.log (method)"; }
 }
 
 class Fabs: LdOBJECT
@@ -226,7 +225,7 @@ class Fabs: LdOBJECT
         return new LdNum(fabs(args[0].__num__));
     }
 
-    override string __str__() { return "fabs (math method)"; }
+    override string __str__() { return "math.fabs (method)"; }
 }
 
 class Pow: LdOBJECT
@@ -235,7 +234,7 @@ class Pow: LdOBJECT
         return new LdNum(pow(args[0].__num__, args[1].__num__));
     }
 
-    override string __str__() { return "pow (math method)"; }
+    override string __str__() { return "math.pow (method)"; }
 }
 
 class Floor: LdOBJECT
@@ -244,7 +243,7 @@ class Floor: LdOBJECT
         return new LdNum(floor(args[0].__num__));
     }
 
-    override string __str__() { return "floor (math method)"; }
+    override string __str__() { return "math.floor (method)"; }
 }
 
 class Ceil: LdOBJECT
@@ -253,7 +252,7 @@ class Ceil: LdOBJECT
         return new LdNum(ceil(args[0].__num__));
     }
 
-    override string __str__() { return "ceil (math method)"; }
+    override string __str__() { return "math.ceil (method)"; }
 }
 
 class Sqrt: LdOBJECT
@@ -262,7 +261,7 @@ class Sqrt: LdOBJECT
         return new LdNum(sqrt(args[0].__num__));
     }
 
-    override string __str__() { return "sqrt (math method)"; }
+    override string __str__() { return "math.sqrt (method)"; }
 }
 
 class Cos: LdOBJECT
@@ -271,7 +270,7 @@ class Cos: LdOBJECT
         return new LdNum(cos(args[0].__num__));
     }
 
-    override string __str__() { return "cos (math method)"; }
+    override string __str__() { return "math.cos (method)"; }
 }
 
 class CosH: LdOBJECT
@@ -280,7 +279,7 @@ class CosH: LdOBJECT
         return new LdNum(cosh(args[0].__num__));
     }
 
-    override string __str__() { return "cosh (math method)"; }
+    override string __str__() { return "math.cosh (method)"; }
 }
 
 class Acos: LdOBJECT
@@ -289,7 +288,7 @@ class Acos: LdOBJECT
         return new LdNum(acos(args[0].__num__));
     }
 
-    override string __str__() { return "acos (math method)"; }
+    override string __str__() { return "math.acos (method)"; }
 }
 
 class AcosH: LdOBJECT
@@ -298,7 +297,7 @@ class AcosH: LdOBJECT
         return new LdNum(acosh(args[0].__num__));
     }
 
-    override string __str__() { return "acosh (math method)"; }
+    override string __str__() { return "math.acosh (method)"; }
 }
 
 class Sin: LdOBJECT
@@ -307,7 +306,7 @@ class Sin: LdOBJECT
         return new LdNum(sin(args[0].__num__));
     }
 
-    override string __str__() { return "sin (math method)"; }
+    override string __str__() { return "math.sin (method)"; }
 }
 
 class SinH: LdOBJECT
@@ -316,7 +315,7 @@ class SinH: LdOBJECT
         return new LdNum(sinh(args[0].__num__));
     }
 
-    override string __str__() { return "sinh (math method)"; }
+    override string __str__() { return "math.sinh (method)"; }
 }
 
 class Asin: LdOBJECT
@@ -325,7 +324,7 @@ class Asin: LdOBJECT
         return new LdNum(asin(args[0].__num__));
     }
 
-    override string __str__() { return "asin (math method)"; }
+    override string __str__() { return "math.asin (method)"; }
 }
 
 class AsinH: LdOBJECT
@@ -334,7 +333,7 @@ class AsinH: LdOBJECT
         return new LdNum(asinh(args[0].__num__));
     }
 
-    override string __str__() { return "asinh (math method)"; }
+    override string __str__() { return "math.asinh (method)"; }
 }
 
 class Tan: LdOBJECT
@@ -343,7 +342,7 @@ class Tan: LdOBJECT
         return new LdNum(tan(args[0].__num__));
     }
 
-    override string __str__() { return "tan (math method)"; }
+    override string __str__() { return "math.tan (method)"; }
 }
 
 class TanH: LdOBJECT
@@ -352,7 +351,7 @@ class TanH: LdOBJECT
         return new LdNum(tanh(args[0].__num__));
     }
 
-    override string __str__() { return "tanh (math method)"; }
+    override string __str__() { return "math.tanh (method)"; }
 }
 
 class Atan: LdOBJECT
@@ -361,7 +360,7 @@ class Atan: LdOBJECT
         return new LdNum(atan(args[0].__num__));
     }
 
-    override string __str__() { return "atan (math method)"; }
+    override string __str__() { return "math.atan (method)"; }
 }
 
 class AtanH: LdOBJECT
@@ -370,5 +369,5 @@ class AtanH: LdOBJECT
         return new LdNum(atanh(args[0].__num__));
     }
 
-    override string __str__() { return "atanh (math method)"; }
+    override string __str__() { return "math.atanh (method)"; }
 }

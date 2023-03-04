@@ -19,7 +19,7 @@ class oSys: LdOBJECT
 			"argv": set_argv(argv),
 			"path": set_path(),
 
-			"object_instances": new GetInstances(),
+			//"object_instances": new GetInstances(),
 
 			"modules_path": Modules,
 			"executable": new LdStr(thisExePath),
@@ -34,12 +34,12 @@ class oSys: LdOBJECT
 }
 
 
-class GetInstances: LdOBJECT
-{
-	override LdOBJECT opCall(LdOBJECT[] args) {
-		return new LdNum(LdOBJECT.objects);
-	}
-}
+//class GetInstances: LdOBJECT
+//{
+//	override LdOBJECT opCall(LdOBJECT[] args) {
+//		return new LdNum(LdOBJECT.objects);
+//	}
+//}
 
 
 LdOBJECT set_argv(string[] arg)

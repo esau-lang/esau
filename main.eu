@@ -1,0 +1,6 @@
+import str
+
+x = str.encode("\xf0\x9f\x98\xad")
+
+print(x)
+

@@ -4,9 +4,7 @@ module LdBytes2;
 import std.conv;
 import std.stdio;
 
-import LdBytes;
-import LdObject, LdNumber, LdString, LdArray;
-import LdHash, LdType;
+import LdObject, LdType, LdBytes;
 
 
 alias LdOBJECT[string] HEAP;
@@ -25,10 +23,9 @@ class Op_Num: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
 		return this._num;
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Nadd: LdByte {
+class Op_Add: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -39,10 +36,9 @@ class Op_Nadd: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
 		return new LdNum(left(_heap).__num__ + right(_heap).__num__);
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Nminus: LdByte {
+class Op_Minus: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -53,10 +49,9 @@ class Op_Nminus: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
 		return new LdNum(left(_heap).__num__ - right(_heap).__num__);
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Ntimes: LdByte {
+class Op_Times: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -67,10 +62,9 @@ class Op_Ntimes: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
 		return new LdNum(left(_heap).__num__ * right(_heap).__num__);
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Ndivide: LdByte {
+class Op_Divide: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -81,10 +75,9 @@ class Op_Ndivide: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
 		return new LdNum(left(_heap).__num__ / right(_heap).__num__);
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Nremainder: LdByte {
+class Op_Remainder: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -95,10 +88,9 @@ class Op_Nremainder: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
 		return new LdNum(left(_heap).__num__ % right(_heap).__num__);
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Nequals: LdByte {
+class Op_Equals: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -108,14 +100,13 @@ class Op_Nequals: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if (left(_heap).__str__ == right(_heap).__str__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Nless: LdByte {
+class Op_Less: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -125,14 +116,13 @@ class Op_Nless: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if (left(_heap).__num__ < right(_heap).__num__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Ngreat: LdByte {
+class Op_Great: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -142,14 +132,13 @@ class Op_Ngreat: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if (left(_heap).__num__ > right(_heap).__num__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Nlequals: LdByte {
+class Op_Lequals: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -159,14 +148,13 @@ class Op_Nlequals: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if (left(_heap).__num__ <= right(_heap).__num__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
-class Op_Ngequals: LdByte {
+class Op_Gequals: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -176,14 +164,13 @@ class Op_Ngequals: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if (left(_heap).__num__ >= right(_heap).__num__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
-class Op_NNOTequals: LdByte {
+class Op_NOTequals: LdByte {
 	LdByte left, right;
 
 	this(LdByte left, LdByte right){
@@ -193,11 +180,10 @@ class Op_NNOTequals: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if (left(_heap).__str__ != right(_heap).__str__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
 
@@ -212,82 +198,10 @@ class Op_Str: LdByte {
 	}
 
 	override LdOBJECT opCall(HEAP _heap) {
-		return this._str;
+		return _str;
 	}
-	override int type(){ return 2; }
 }
 
-
-class Op_Sadd: LdByte {
-	LdByte left, right;
-
-	this(LdByte left, LdByte right){
-		this.left = left;
-		this.right = right;
-	}
-
-	override LdOBJECT opCall(HEAP _heap) {
-		return new LdStr(left(_heap).__str__ ~ right(_heap).__str__);
-	}
-	override int type(){ return 2; }
-}
-
-
-import std.array: replicate;
-
-class Op_Stimes: LdByte {
-	LdByte left, right;
-
-	this(LdByte left, LdByte right){
-		this.left = left;
-		this.right = right;
-	}
-
-	override LdOBJECT opCall(HEAP _heap) {
-		return new LdStr(replicate(left(_heap).__str__, cast(int)right(_heap).__num__));
-	}
-
-	override int type(){ return 2; }
-}
-
-class Op_Sequals: LdByte {
-	LdByte left, right;
-
-	this(LdByte left, LdByte right){
-		this.left = left;
-		this.right = right;
-	}
-
-	override LdOBJECT opCall(HEAP _heap) {
-		if (left(_heap).__str__ == right(_heap).__str__)
-			return new LdTrue();
-
-		return new LdFalse();
-	}
-	override int type(){ return 1; }
-}
-
-class Op_SNOTequals: LdByte {
-	LdByte left, right;
-
-	this(LdByte left, LdByte right){
-		this.left = left;
-		this.right = right;
-	}
-
-	override LdOBJECT opCall(HEAP _heap) {
-		if (left(_heap).__str__ != right(_heap).__str__)
-			return new LdTrue();
-
-		return new LdFalse();
-	}
-	override int type(){ return 1; }
-}
-
-
-
-
-// ARRAYS [., ., .]
 
 class Op_Array: LdByte {
 	LdByte[] items;
@@ -304,25 +218,7 @@ class Op_Array: LdByte {
 
 		return new LdArr(arr);
 	}
-	override int type(){ return 3; }
 }
-
-
-class Op_Aadd: LdByte {
-	LdByte left, right;
-
-	this(LdByte left, LdByte right){
-		this.left = left;
-		this.right = right;
-	}
-
-	override LdOBJECT opCall(HEAP _heap) {
-		return new LdArr(left(_heap).__array__ ~ right(_heap).__array__);
-	}
-
-	override int type(){ return 3; }
-}
-
 
 
 // HASH  {.:.}
@@ -344,8 +240,6 @@ class Op_Hash: LdByte {
 
 		return new LdHsh(hash);
 	}
-
-	override int type(){ return 3; }
 }
 
 
@@ -377,7 +271,7 @@ class Op_PiAssign: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		key(_heap).__assign__(index(_heap), value(_heap));
-		return new LdOBJECT();
+		return RETURN.A;
 	}
 }
 
@@ -401,7 +295,7 @@ class Op_Pobj: LdByte {
 			h ~= i(_heap);
 
 		new LdTyp(name, h, attrs, code, _heap);
-		return new LdOBJECT();
+		return RETURN.A;
 	}
 }
 
@@ -445,23 +339,20 @@ class Op_PdotAssign: LdByte {
 
 class Op_True: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
-		return new LdTrue();
+		return RETURN.B;
 	}
-	override int type(){ return 1; }
 }
 
 class Op_False: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
 class Op_None: LdByte {
 	override LdOBJECT opCall(HEAP _heap) {
-		return new LdNone();
+		return RETURN.A;
 	}
-	override int type(){ return 1; }
 }
 
 
@@ -477,11 +368,10 @@ class Op_Not: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if(!value(_heap).__true__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
-	override int type(){ return 1; }
 }
 
 class Op_Or: LdByte {
@@ -494,9 +384,9 @@ class Op_Or: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if(left(_heap).__true__ || right(_heap).__true__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
 }
 
@@ -510,9 +400,9 @@ class Op_And: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap) {
 		if(left(_heap).__true__ && right(_heap).__true__)
-			return new LdTrue();
+			return RETURN.B;
 
-		return new LdFalse();
+		return RETURN.C;
 	}
 }
 

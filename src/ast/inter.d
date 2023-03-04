@@ -20,72 +20,57 @@ class _GenInter {
 
 
 	void climb(){
-		this.branch += 1;
+		branch += 1;
 
-		if (this.branch < this.tree.length)
-			this.leaf = this.tree[this.branch];
+		if (branch < tree.length)
+			leaf = tree[branch];
 		else
-			this.seed = 0;
+			seed = 0;
 	}
 
 	LdByte IntOp(string op, LdByte left, LdByte right){
 		if (op == "+")
-			return new Op_Nadd(left, right);
+			return new Op_Add(left, right);
 
 		else if (op == "-")
-			return new Op_Nminus(left, right);
+			return new Op_Minus(left, right);
 
 		else if (op == "*")
-			return new Op_Ntimes(left, right);
+			return new Op_Times(left, right);
 
 		else if (op == "/")
-			return new Op_Ndivide(left, right);
+			return new Op_Divide(left, right);
 
 		else if (op == "%")
-			return new Op_Nremainder(left, right);
+			return new Op_Remainder(left, right);
 
 		else if (op == "<")
-			return new Op_Nless(left, right);
+			return new Op_Less(left, right);
 
 		else if (op == ">")
-			return new Op_Ngreat(left, right);
+			return new Op_Great(left, right);
 
 		else if (op == "==")
-			return new Op_Nequals(left, right);
+			return new Op_Equals(left, right);
 
 		else if (op == "!=")
-			return new Op_NNOTequals(left, right);
+			return new Op_NOTequals(left, right);
 
 		else if (op == "<=")
-			return new Op_Nlequals(left, right);
+			return new Op_Lequals(left, right);
 
 		else if (op == ">=")
-			return new Op_Ngequals(left, right);
+			return new Op_Gequals(left, right);
 
 		return right;
 	}
 
-	LdByte StrOp(string op, LdByte left, LdByte right){
-		if (op == "+")
-			return new Op_Sadd(left, right);
-
-		else if (op == "*")
-			return new Op_Stimes(left, right);
-
-		else if (op == "==")
-			return new Op_Sequals(left, right);
-
-		else if (op == "!=")
-			return new Op_SNOTequals(left, right);
-
-		return right;
-	}
 
 	LdByte BinaryOp(Node sap){
 		int type = sap.leftRight[0].type;
 
-		LdByte left = this.water(sap.leftRight[0]);
-		LdByte right = this.water(sap.leftRight[1]);
+		LdByte left = water(sap.leftRight[0]);
+		LdByte right = water(sap.leftRight[1]);
 
 		if (sap.str == "NOT")
 			return new Op_Not(right);
@@ -96,15 +81,6 @@ class _GenInter {
 		else if (sap.str == "AND")
 			return new Op_And(left, right);
 
-		else if (left.type == 1)
-			return IntOp(sap.str, left, right);
-
-		else if (left.type == 2)
-			return StrOp(sap.str, left, right);
-
-		else if (left.type == 3)
-			return new Op_Aadd(left, right);
-		
 		return IntOp(sap.str, left, right);
 	}
 
@@ -281,7 +257,11 @@ class _GenInter {
 	}
 
 	void gen_imp() {
-		bytez ~= new Op_Import(leaf.args, leaf.deepin);
+		bytez ~= new Iimport(leaf.strs, leaf.args);
+	}
+
+	void gen_from() {
+		bytez ~= new Ifrom(leaf.str, leaf.strs, leaf.args);
 	}
 
 	void irrigate(){
@@ -328,6 +308,9 @@ class _GenInter {
 					break;
 				case 29:
 					gen_imp();
+					break;
+				case 36:
+					gen_from();
 					break;
 				case 30:
 					gen_addFls();

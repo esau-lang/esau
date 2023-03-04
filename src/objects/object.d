@@ -1,17 +1,18 @@
 module LdObject;
 
+import std.stdio;
+
 import std.conv: to;
 import std.format: format;
 import std.algorithm.iteration: map;
 import std.array: join;
 
+import std.json: JSONValue, toJSON;
 
 class LdOBJECT {
 	LdOBJECT[string] hash, props;
 
-	static long objects;
-
-	this(){ objects++; }
+	LdOBJECT[]* __ptr__(){ return null; }
 
 	string __str__(){ return "null";}
 
@@ -33,11 +34,11 @@ class LdOBJECT {
 
 	char[] __chars__() { return []; }
 
+	string __type__(){ return "function"; }
+
 	LdOBJECT __index__(LdOBJECT arg) {return new LdOBJECT(); }
 
-	LdOBJECT __getProp__(string prop) {
-		return __props__[prop];
-	}
+	LdOBJECT __getProp__(string prop) { return __props__[prop]; }
 
 	LdOBJECT __setProp__(string prop, LdOBJECT value){
 		__props__[prop] = value;
@@ -46,7 +47,7 @@ class LdOBJECT {
 
 	LdOBJECT __super__(LdOBJECT self){ return new LdOBJECT(); }
 
-	void __assign__(LdOBJECT index, LdOBJECT value){}
+	void __assign__(LdOBJECT index, LdOBJECT value){ __props__[index.__str__] = value; }
 
 	LdOBJECT opCall(LdOBJECT[] args) { return new LdOBJECT(); }
 
@@ -56,20 +57,28 @@ class LdOBJECT {
 alias LdOBJECT[string] HEAP;
 
 
+enum RETURN {
+	D = new LdOBJECT(),
+	A = new LdNone(),
+	B = new LdTrue(),
+	C = new LdFalse(),
+}
+
+
 class LdTrue: LdOBJECT {
 	override string __str__(){ return "true"; }
-
+	override string __type__(){ return "boolean"; }
 	override double __true__() { return 1; }
 }
 
-
-class LdFalse: LdOBJECT {
-	override string __str__(){ return "true"; }
+class LdFalse: LdOBJECT{
+	override string __type__(){ return "boolean"; }
+	override string __str__(){ return "false"; }
 }
 
-
 class LdNone: LdOBJECT {
-	override string __str__(){ return "null"; }
+	override string __type__(){ return "null"; }
+	override string __str__(){ return "none"; }
 }
 
 
@@ -80,36 +89,6 @@ class LdStop_Iterator: LdOBJECT {
 }
 
 
-class LdStr: LdOBJECT {
-	string _str;
-    LdOBJECT[string] props;
-	
-	this(string _str){
-		this._str = _str;
-	}
-
-	override string __str__(){
-		return _str;
-	}
-
-	override LdOBJECT __index__(LdOBJECT arg){
-		return new LdStr(to!string(_str[cast(size_t)arg.__num__]));
-	}
-
-    override size_t __length__(){
-        return _str.length;
-    }
-
-	override double __true__(){
-		return cast(double)_str.length;
-	}
-
-	override string __json__(){
-		return format("'%s'", _str);
-	}
-}
-
-
 class LdNum: LdObject.LdOBJECT {
 	double num;
 	
@@ -117,21 +96,18 @@ class LdNum: LdObject.LdOBJECT {
 		this.num = num;
 	}
 
-	override double __num__(){
-		return this.num;
-	}
+	override double __num__(){ return num; }
 
-	override string __str__(){
-		return to!string(num);
-	}
+	override string __str__(){ return to!string(num); }
 
-	override double __true__(){
-		return this.num;
-	}
+	override string __type__(){ return "number"; }
+
+	override double __true__(){ return num; }
 }
 
 
-class LdChr: LdOBJECT {
+class LdChr: LdOBJECT
+{
 	char[] _chars;
 	
 	this(char[] _chars){
@@ -140,6 +116,10 @@ class LdChr: LdOBJECT {
 
 	override char[] __chars__(){
 		return _chars;
+	}
+
+	override string __type__(){
+		return "bytes";
 	}
 
 	override size_t __length__(){
@@ -172,6 +152,10 @@ class LdHsh: LdOBJECT
 		this.hash[index.__str__] = value;
 	}
 
+	override string __type__(){
+		return "dict";
+	}
+
 	override double __true__(){
 		return cast(double)hash.length;
 	}
@@ -202,6 +186,10 @@ class LdDict: LdOBJECT
 		this.props = props;
 	}
 
+	override string __type__(){
+		return "enum";
+	}
+
 	override HEAP __props__(){ return props; }
 
 	override string __str__(){ return name; }
@@ -220,6 +208,10 @@ class LdArr: LdOBJECT {
 		];
 	}
 
+	override LdOBJECT[]* __ptr__(){
+		return &arr;
+	}
+
 	override LdOBJECT[] __array__(){
 		return this.arr;
 	}
@@ -228,16 +220,20 @@ class LdArr: LdOBJECT {
         return arr.length;
     }
 
+    override string __type__(){
+		return "list";
+	}
+
 	override double __true__(){
 		return cast(double)arr.length;
 	}
 
 	override LdOBJECT __index__(LdOBJECT arg){
-		return this.arr[cast(ulong)arg.__num__];
+		return this.arr[cast(size_t)arg.__num__];
 	}
 
 	override void __assign__(LdOBJECT index, LdOBJECT value){
-		this.arr[cast(ulong)index.__num__] = value;
+		this.arr[cast(size_t)index.__num__] = value;
 	}
 
 	override string __str__(){
@@ -298,4 +294,37 @@ class __next__: LdOBJECT {
     override string __str__() { return "length ([] object method)"; }
 }
 
+// STRINGS
+class LdStr: LdOBJECT {
+    string _str;
+    LdOBJECT[string] props;
+    
+    this(string _str){
+    	this._str = _str;
+    }
 
+    override string __str__(){
+        return _str;
+    }
+
+    override LdOBJECT __index__(LdOBJECT arg){
+        return new LdStr(to!string(_str[cast(size_t)arg.__num__]));
+    }
+
+    override string __type__(){
+    	return "string";
+    }
+
+    override size_t __length__(){
+        return _str.length;
+    }
+
+    override double __true__(){
+        return cast(double)_str.length;
+    }
+
+    override string __json__(){
+    	const js = JSONValue(_str);
+        return toJSON(js);
+    }
+}

@@ -28,7 +28,7 @@ class oSocket: LdOBJECT
 
 	override LdOBJECT[string] __props__(){ return props; }
 
-	override string __str__(){ return "Socket (socket inteface)"; }
+	override string __str__(){ return "socket (native module)"; }
 }
 
 

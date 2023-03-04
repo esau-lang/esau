@@ -2,9 +2,7 @@ module LdFunction;
 
 import std.stdio;
 import std.format: format;
-
 import std.array: join;
-import core.stdc.stdlib: exit;
 
 import LdObject, LdBytes2, LdBytes, LdExec;
 
@@ -29,10 +27,10 @@ class LdFn: LdOBJECT {
 		this.def_length = defaults.length;
 
 		this.props = [
-			"self": new LdOBJECT(),
-			"__repr__": new LdStr(name ~ " (generic method)"),
+			"self": RETURN.A,
+			"__object__": RETURN.A,
+			"__repr__": new LdStr(format("%s (custom method)", name)),
 			"__name__": new LdStr(name),
-			"__object__": new LdStr(""),
 		];
 	}
 
@@ -56,24 +54,7 @@ class LdFn: LdOBJECT {
 		return new _Interpreter(code, point).heap["#rt"];
 	}
 
-	override void __assign__(LdOBJECT index, LdOBJECT value){
-		this.hash[index.__str__] = value;
-	}
+	override LdOBJECT[string] __props__(){ return props; }
 
-	override LdOBJECT __getProp__(string prop){
-		return props[prop];
-	}
-
-	override LdOBJECT __setProp__(string prop, LdOBJECT value){
-		props[prop] = value;
-		return ret;
-	}
-
-	override LdOBJECT[string] __hash__(){
-		return props;
-	}
-
-	override string __str__(){
-		return props["__repr__"].__str__;
-	}
+	override string __str__(){ return props["__repr__"].__str__; }
 }

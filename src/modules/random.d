@@ -36,7 +36,7 @@ class oRandom: LdOBJECT
 
 	override LdOBJECT[string] __props__(){ return props; }
 
-	override string __str__(){ return "random (random data generating unit)"; }
+	override string __str__(){ return "random (native module)"; }
 }
 
 
@@ -52,7 +52,7 @@ class _Pool: LdOBJECT
         return new LdStr(str);
     }
 
-    override string __str__() { return "string (random method)"; }
+    override string __str__() { return "random.string (method)"; }
 }
 
 class _String: LdOBJECT 
@@ -70,7 +70,7 @@ class _String: LdOBJECT
         return new LdStr(str);
     }
 
-    override string __str__() { return "string (random method)"; }
+    override string __str__() { return "random.string (method)"; }
 }
 
 class _Pick: LdOBJECT 
@@ -79,7 +79,7 @@ class _Pick: LdOBJECT
     	return choice(args[0].__array__);
     }
 
-    override string __str__() { return "pick (random method)"; }
+    override string __str__() { return "random.pick (method)"; }
 }
 
 class _Bool: LdOBJECT 
@@ -91,7 +91,7 @@ class _Bool: LdOBJECT
         return new LdFalse();
     }
 
-    override string __str__() { return "bool (random method)"; }
+    override string __str__() { return "random.bool (method)"; }
 }
 
 class _RandInt: LdOBJECT 
@@ -103,7 +103,7 @@ class _RandInt: LdOBJECT
         return new LdNum(cast(int)(uniform(0, args[0].__num__)));
     }
 
-    override string __str__() { return "integer (random method)"; }
+    override string __str__() { return "random.integer (method)"; }
 }
 
 class _Sample: LdOBJECT 
@@ -116,7 +116,7 @@ class _Sample: LdOBJECT
         return new LdArr(arr);
     }
 
-    override string __str__() { return "sample (random method)"; }
+    override string __str__() { return "random.sample (method)"; }
 }
 
 class _Shuffle: LdOBJECT 
@@ -126,7 +126,7 @@ class _Shuffle: LdOBJECT
         return new LdNone();
     }
 
-    override string __str__() { return "shuffle (random method)"; }
+    override string __str__() { return "random.shuffle (method)"; }
 }
 
 class _Random: LdOBJECT 
@@ -135,7 +135,7 @@ class _Random: LdOBJECT
         return new LdNum(uniform(0.0000000001, 1));
     }
 
-    override string __str__() { return "random (random method)"; }
+    override string __str__() { return "random.random (method)"; }
 }
 
 class _Uniform: LdOBJECT 
@@ -144,5 +144,5 @@ class _Uniform: LdOBJECT
         return new LdNum(uniform(args[0].__num__, args[1].__num__));
     }
 
-    override string __str__() { return "uniform (random method)"; }
+    override string __str__() { return "random.uniform (method)"; }
 }

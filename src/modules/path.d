@@ -2,7 +2,9 @@ module lPath;
 
 import std.format: format;
 import std.algorithm.searching: find;
-import std.algorithm.iteration: each;
+import std.algorithm.iteration: each, map;
+
+import std.array: array;
 
 import std.file;
 import std.path;
@@ -32,7 +34,9 @@ class oPath: LdOBJECT
 			"copy": new _Copy(),
 			"move": new _Move(),
 
+            "chdir": new _Chdir(),
 			"mkdir": new _MakeDir(),
+
 			"rmdir": new _RmDir(),
 			"remove": new _Remove(),
 
@@ -49,25 +53,35 @@ class oPath: LdOBJECT
 
 	override LdOBJECT[string] __props__(){ return props; }
 
-	override string __str__(){ return "path (Paths handling unit)"; }
+	override string __str__(){ return "path (native module)"; }
 }
 
 
 class _Readdir: LdOBJECT 
 {
     override LdOBJECT opCall(LdOBJECT[] args){
-        string htap = getcwd();
+        string htap;
 
         if (args.length)
             htap = args[0].__str__;
+        else
+            htap = getcwd();
 
-        LdOBJECT[] list;
-        dirEntries(htap, SpanMode.shallow, false).each!(i => list ~= new LdStr(i));
+        LdOBJECT[] list = cast(LdOBJECT[])dirEntries(htap, SpanMode.shallow, false).map!(i => new LdStr(i)).array;
 
         return new LdArr(list);
     }
 
-    override string __str__() { return "readdir (path method)"; }
+    override string __str__() { return "path.readdir (method)"; }
+}
+
+class _Chdir: LdOBJECT {
+    override LdOBJECT opCall(LdOBJECT[] args){
+        chdir(args[0].__str__);
+        return RETURN.A;
+    }
+
+    override string __str__() { return "path.chdir (method)"; }
 }
 
 class _Basename: LdOBJECT 
@@ -76,7 +90,7 @@ class _Basename: LdOBJECT
     	return new LdStr(baseName(args[0].__str__));
     }
 
-    override string __str__() { return "basename (path method)"; }
+    override string __str__() { return "path.basename (method)"; }
 }
 
 class _Dirname: LdOBJECT 
@@ -85,7 +99,7 @@ class _Dirname: LdOBJECT
     	return new LdStr(dirName(args[0].__str__));
     }
 
-    override string __str__() { return "dirname (path method)"; }
+    override string __str__() { return "path.dirname (method)"; }
 }
 
 class _Abspath: LdOBJECT 
@@ -94,7 +108,7 @@ class _Abspath: LdOBJECT
     	return new LdStr(absolutePath(args[0].__str__));
     }
 
-    override string __str__() { return "abspath (path method)"; }
+    override string __str__() { return "path.abspath (method)"; }
 }
 
 class _Relpath: LdOBJECT 
@@ -103,7 +117,7 @@ class _Relpath: LdOBJECT
     	return new LdStr(relativePath(args[0].__str__));
     }
 
-    override string __str__() { return "relpath (path method)"; }
+    override string __str__() { return "path.relpath (method)"; }
 }
 
 class _Remove: LdOBJECT 
@@ -113,7 +127,7 @@ class _Remove: LdOBJECT
     	return new LdNone();
     }
 
-    override string __str__() { return "remove (path method)"; }
+    override string __str__() { return "path.remove (method)"; }
 }
 
 class _RmDir: LdOBJECT 
@@ -123,7 +137,7 @@ class _RmDir: LdOBJECT
     	return new LdNone();
     }
 
-    override string __str__() { return "rmdir (path method)"; }
+    override string __str__() { return "path.rmdir (method)"; }
 }
 
 class _MakeDir: LdOBJECT 
@@ -133,7 +147,7 @@ class _MakeDir: LdOBJECT
     	return new LdNone();
     }
 
-    override string __str__() { return "mkdir (path method)"; }
+    override string __str__() { return "path.mkdir (method)"; }
 }
 
 class _Move: LdOBJECT 
@@ -143,7 +157,7 @@ class _Move: LdOBJECT
     	return new LdNone();
     }
 
-    override string __str__() { return "move (path method)"; }
+    override string __str__() { return "path.move (method)"; }
 }
 
 class _Copy: LdOBJECT 
@@ -153,7 +167,7 @@ class _Copy: LdOBJECT
     	return new LdNone();
     }
 
-    override string __str__() { return "copy (path method)"; }
+    override string __str__() { return "path.copy (method)"; }
 }
 
 class _Tmp: LdOBJECT 
@@ -162,7 +176,7 @@ class _Tmp: LdOBJECT
        	return new LdStr(tempDir());
     }
 
-    override string __str__() { return "tmp (path method)"; }
+    override string __str__() { return "path.tmp (method)"; }
 }
 
 class _Pwd: LdOBJECT 
@@ -171,7 +185,7 @@ class _Pwd: LdOBJECT
        	return new LdStr(getcwd());
     }
 
-    override string __str__() { return "pwd (path method)"; }
+    override string __str__() { return "path.pwd (method)"; }
 }
 
 class _IsFile: LdOBJECT 
@@ -183,7 +197,7 @@ class _IsFile: LdOBJECT
     	return new LdFalse();
     }
 
-    override string __str__() { return "isfile (path method)"; }
+    override string __str__() { return "path.isfile (method)"; }
 }
 
 class _IsDir: LdOBJECT 
@@ -195,7 +209,7 @@ class _IsDir: LdOBJECT
     	return new LdFalse();
     }
 
-    override string __str__() { return "isdir (path method)"; }
+    override string __str__() { return "path.isdir (method)"; }
 }
 
 class _Exists: LdOBJECT 
@@ -207,7 +221,7 @@ class _Exists: LdOBJECT
     	return new LdFalse();
     }
 
-    override string __str__() { return "exists (path method)"; }
+    override string __str__() { return "path.exists (method)"; }
 }
 
 class _Join: LdOBJECT 
@@ -219,5 +233,5 @@ class _Join: LdOBJECT
     	return new LdStr(x);
     }
 
-    override string __str__() { return "join (path method)"; }
+    override string __str__() { return "path.join (method)"; }
 }

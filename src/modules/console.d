@@ -34,6 +34,7 @@ static LdOBJECT[string] __console_props__(){
 			"len": new _Len(),
 			"attr": new _Attr(),
 
+			"type": new _Type(),
 			"exit": new _Exit(),
 
 			"StopIterator": new _StopIterator(),
@@ -53,7 +54,7 @@ class _Print: LdOBJECT
 		args.each!(n => cprints(n.__str__));
 		printf("\n");
 
-		return new LdOBJECT();
+		return RETURN.A;
 	}
 
 	override string __str__(){ return "console.print (method)"; }
@@ -90,6 +91,16 @@ class _Len: LdOBJECT
 	override string __str__(){ return "console.len (method)"; } 
 }
 
+class _Type: LdOBJECT 
+{
+	override LdOBJECT opCall(LdOBJECT[] args){
+		return new LdStr(args[0].__type__);
+	}
+
+	override string __str__(){ return "console.type (method)"; } 
+}
+
+
 class _Attr: LdOBJECT 
 {
 	override LdOBJECT opCall(LdOBJECT[] args){
@@ -106,7 +117,7 @@ class _Exit: LdOBJECT
 {
 	override LdOBJECT opCall(LdOBJECT[] args){
 		exit(0);
-		return new LdNone();
+		return RETURN.A;
 	}
 
 	override string __str__(){ return "console.exit (method)"; } 

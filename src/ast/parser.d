@@ -1,3 +1,6 @@
+
+
+
 module LdParser;
 
 import std.stdio;
@@ -5,25 +8,35 @@ import std.conv;
 import std.algorithm;
 import std.string;
 import std.file;
+
+import std.path: buildPath;
+
+import std.format: format;
 import core.stdc.stdlib;
 
-import LdLexer, LdNode;
+import LdLexer: _Lex;
+import LdNode;
 
 
 class _Parse{
 	int pos;
 	bool end;
+
 	TOKEN tok;
 	Node[] ast;
+	
 	string file;
 	TOKEN[] toks;
+	
 	Node[] defaults;
 
 	this(TOKEN[] toks, string file){
 		this.end = true;
 		this.toks = toks;
 		this.file = file;
+
 		this.ast = ast;
+
 		this.pos = -1;
 		this.defaults = defaults;
 		this.tok = tok;
@@ -194,7 +207,7 @@ class _Parse{
 				i += 1;
 			} else {
 				if (st.length){
-					forms ~= new StringNode(st);
+					forms ~= new StrOp(st);
 					st = "";
 				}
 				i += 1;
@@ -221,7 +234,7 @@ class _Parse{
 		}
 
 		if (st.length)
-			forms ~= new StringNode(st);
+			forms ~= new StrOp(st);
 
 		return new FormatNode(forms);
 	}
@@ -252,11 +265,11 @@ class _Parse{
 			ret = new IdNode(this.tok.value, this.tok.line, this.tok.loc);
 
 		else if (this.tok.type == "STR")
-			ret = new StringNode(this.tok.value);
+			ret = new StrOp(this.tok.value);
 			
 		else if (this.tok.type == "NUM"){
 			double number = to!double(this.tok.value);
-			ret = new NumberNode(number);
+			ret = new NumOp(number);
 
 		} else if (this.tok.type == "TRUE")
 			ret = new TrueNode();
@@ -360,7 +373,7 @@ class _Parse{
 		if (this.tok.type == "NOT"){
 			string op = this.tok.type;
 			this.next();
-			return new BinaryNode(new StringNode(""), op, this.eqexpr(end)); 
+			return new BinaryNode(new StrOp(""), op, this.eqexpr(end)); 
 		
 		}
 
@@ -509,7 +522,7 @@ class _Parse{
 	}
 
 	void parse_identifier() {
-		string id = this.tok.value;
+		string id = tok.value;
 		this.next();
 
 		if (this.tok.type == "="){
@@ -518,7 +531,7 @@ class _Parse{
 			Node expr = this.eval("NL;");
 			this.ast ~= new VarNode(id, expr);
 
-		} else if (find(".([", this.tok.type).length) {
+		} else if (find(".([", tok.type).length) {
 			this.prev();
 			this.ast ~= this.eval("NL;");
 			this.next();
@@ -586,7 +599,7 @@ class _Parse{
 		while (this.end){
 			if (find("ELIFELSE", this.tok.type).length){
 				if (this.tok.type == "ELSE"){
-					expr = new NumberNode(1);
+					expr = new NumOp(1);
 					this.next();
 
 				} else {
@@ -706,67 +719,102 @@ class _Parse{
 	}
 
 	void parse_import(){
-		bool _set = true;
-
-		string[] _path, _inn;
-		string[][string] _attrs;
-
-		if (tok.type == "FR") {
-			this.next();
-
-			while (!find("IM", tok.type).length && this.end){
-				if (tok.type == "ID")
-					_path ~= tok.value;
-
-				else if (tok.type != ".")
-					SyntaxError("Invalid syntax Import statement, expected an '.' token to separate paths.");
-
-				next();
-			}
-		}
 		next();
+		string look;
+		string[] name, save;
+		string[string] mods;
 
-		while (!find("NL;", this.tok.type).length && this.end){
-			if (this.tok.type == "ID") {
-				_inn ~= tok.value;                _set = true;
+		while(end && !(find("NL;", tok.type).length)) {
+
+			if(tok.type == "ID")
+				name ~= tok.value;
+
+			else if (tok.type == "AS") {
 				next();
-
-				if (tok.type == "AS") {
-					next();
-
+				if (name.length) {
 					if (tok.type != "ID")
-						SyntaxError("Invalid syntax in import statement, expected an identifier.");
+						throw new Exception(format("Expected an 'ID' token after 'as' token not '%s'.", tok.value));
+					
+					mods[tok.value] ~= buildPath(name);
+					save ~= tok.value;
 
-					_attrs[tok.value] = _inn;     _set = false;
-					next();                       _inn.length = 0;
+					name.length = 0;
 				}
 
-			} else if (tok.type == ","){
-				if(_inn.length){
-					_attrs[_inn[_inn.length - 1]] = _inn;
-					_inn.length = 0;
+			} else if (tok.type == ",") {
+				if (name.length) {
+					
+					mods[name[name.length - 1]] = buildPath(name);
+					save ~= name[name.length - 1];
 
-					_set = false;
+					name.length = 0;
 				}
-				next();
+			} else if(tok.type != ".")
+				throw new Exception(format("Unknown syntax '%s' in import statement", tok.type));
 
-			} else if (tok.type == "*"){
-				_inn ~= tok.value;
-				next();
+			next();
+		}
+		if (name.length) {
+			mods[name[name.length - 1]] = buildPath(name);
+			save ~= name[name.length - 1];
+		}
+		
+		next();
+		ast ~= new ImportNode(mods, save);
+	}
 
-			} else if (tok.type != ".") {
-				this.SyntaxError("Invalid syntax in import statement, expected an '.' token.");
+	void parse_from(){
+		this.next();
+		string fpath;
 
-			} else {
-				next();
-			}
+		if(tok.type == ".") {
+			fpath = ".";
+			next();
 		}
 
-		if (_set && _inn.length)
-			_attrs[_inn[_inn.length - 1]] = _inn;
+		while (end && tok.type != "IM")
+		{
+			if(tok.type == "ID")
+				fpath = buildPath(fpath, tok.value);
+			else if(tok.type != ".")
+				SyntaxError("Unexpected syntax in import statement.");
+			next();
+		}
+		if (tok.type != "IM")
+			SyntaxError(format("Expected an 'import' token not '%s'.", tok.value));
+		this.next();
 
-		next();
-		this.ast ~= new ImportNode(_attrs, _path, tok.line, tok.loc);
+		string[string] attrs;
+		string[] order;
+		string at;
+
+		while(end && !find("NL;", tok.type).length)
+		{
+			if (find("ID*", tok.type).length) {
+				at = tok.value;
+				next();
+
+				if(tok.type != "AS") {
+					attrs[at] = at;
+					order ~= at;
+					continue;
+				}
+				next();
+
+				if(tok.type != "ID")
+					SyntaxError(format("Expected token '%s' after 'as', it should be an ID.", tok.value));
+
+				attrs[at] = tok.value;
+				order ~= at;
+				next();
+			
+			} else if (tok.type != ",")
+				SyntaxError(format("Expected token '%s' after 'import', it should be an ID separated by ','.", tok.value));
+			else
+				next();
+		}
+
+		ast ~= new FromNode(fpath, attrs, order);
 	}
 
 	void parse_try(){
@@ -828,7 +876,7 @@ class _Parse{
 				this.parse_import();
 
 			} else if (this.tok.type == "FR") {
-				this.parse_import();
+				this.parse_from();
 
 			} else if (this.tok.type == "INC") {
 				this.parse_include();

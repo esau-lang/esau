@@ -1,9 +1,11 @@
 import std.stdio;
-import std.socket;
-
+import std.json;
+import std.format;
+import std.base64;
 
 void main(){
+    string u = "\b[0-9][0-9]?/[0-9][0-9]?/[0-9][0-9](?:[0-9][0-9])?\b";
 
-    writeln(getAddressInfo("localhost", "8080"));
+    writeln(u);
 }
 

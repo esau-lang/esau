@@ -8,13 +8,13 @@ import std.algorithm.mutation: remove;
 import LdParser, LdLexer, LdNode, LdBytes, LdIntermediate, LdExec;
 import LdObject, LdString;
 
-import importlib: __setImp__, _loadHeap;
+import importlib: __setImp__, _StartHeap;
 
 
 
 int _console(){
 	string code;
-	auto _Heap = _loadHeap.dup;
+	auto _Heap = _StartHeap.A.dup;
 
 	TOKEN[] tokens;
 	LdByte[] bcode;
@@ -45,14 +45,14 @@ int _console(){
 int _start(string[] args){
 	if (exists(args[0]) && isFile(args[0]))
 	{
-			string code = readText(args[0]);
-			TOKEN[] tokens = new _Lex(code).TOKENS; Node[] tree = new _Parse(tokens, args[0]).ast;
+		string code = readText(args[0]);
+		TOKEN[] tokens = new _Lex(code).TOKENS; Node[] tree = new _Parse(tokens, args[0]).ast;
 
-			LdByte[] bcode = new _GenInter(tree).bytez;
+		LdByte[] bcode = new _GenInter(tree).bytez;
 
-			new _Interpreter(bcode, _loadHeap.dup);
+		new _Interpreter(bcode, _StartHeap.A.dup);
 		
-	}else if(canFind(args, "-v"))
+	} else if(canFind(args, "-v"))
 		writeln("esau 0.0.1");
 
 	else if(canFind(args, "-e"))
@@ -76,7 +76,8 @@ int _start(string[] args){
 int main(string[] args)
 {
 	args = args.remove(0);
-	__setImp__(args);
+	
+	LdBytes._AUTO_VARS = __setImp__(args);
 
 	if(!args.length)
 		return _console();

@@ -3,6 +3,8 @@ module LdBytes;
 import std.stdio;
 import std.algorithm.iteration: each;
 
+import std.format: format;
+
 import LdObject;
 
 import LdFunction;
@@ -10,6 +12,8 @@ import LdExec;
 
 
 alias LdOBJECT[string] HEAP;
+
+LdOBJECT[string] _AUTO_VARS;
 
 
 class LdByte {
@@ -33,8 +37,8 @@ class Op_Var: LdByte {
 	}
 
 	override LdOBJECT opCall(HEAP _heap) {
-		_heap[this.key] = this.value(_heap);
-		return new LdOBJECT();
+		_heap[key] = value(_heap);
+		return RETURN.A;
 	}
 }
 
@@ -47,7 +51,14 @@ class Op_Id: LdByte {
 	}
 
 	override LdOBJECT opCall(HEAP _heap) {
-		return _heap.get(key, new LdOBJECT());
+		if (key in _heap)
+			return _heap[key];
+
+		else if (key in _AUTO_VARS)
+			return _AUTO_VARS[key];
+
+		throw new Exception(format("TypeError: var '%s' is not defined", key));
+		return RETURN.A;
 	}
 }
 
@@ -87,7 +98,7 @@ class Op_FnDef: LdByte {
 			defs ~= i(_heap);
 
 		_heap[name] = new LdFn(name, params, defs, code, _heap);
-		return new LdOBJECT();
+		return RETURN.A;
 	}
 }
 
@@ -162,7 +173,7 @@ class Op_IfCase: LdByte {
 				break;
 			}
 		}
-		return new LdOBJECT();
+		return RETURN.A;
 	}
 }
 
@@ -183,7 +194,7 @@ class Op_While: LdByte {
 		if(_heap["#rtd"].__true__)
 			_heap["#bk"] = new LdTrue();
 
-		return new LdNone();
+		return RETURN.A;
 	}
 }
 
@@ -218,7 +229,7 @@ class Op_For: LdByte {
 		}
 
 		_heap["#bk"] = new LdTrue();
-		return new LdOBJECT();
+		return RETURN.A;
 	}
 }
 
@@ -226,14 +237,14 @@ class Op_For: LdByte {
 class Op_Break: LdByte {
 	override LdOBJECT opCall(HEAP _heap){
 		_heap["#bk"] = new LdFalse();
-		return new LdNone();
+		return RETURN.A;
 	}
 }
 
 
 class Op_Continue: LdByte {
 	override LdOBJECT opCall(HEAP _heap){
-		return new LdNone();
+		return RETURN.A;
 	}
 }
 
@@ -261,26 +272,42 @@ class Op_Include: LdByte {
 
 	override LdOBJECT opCall(HEAP _heap){
 		addFls(modules(_heap).__array__, _heap);
-		return new LdNone();
+		return RETURN.A;
 	}
 }
 
 
-import importlib: import_module;
+import importlib: import_module, import_library;
 
 
-class Op_Import: LdByte {
-	string[][string] fm;
-	string[] im;
+class Iimport: LdByte {
+	string[string] modules;
+	string[] save;
 
-	this(string[] im, string[][string] fm){
-		this.im = im;
-		this.fm = fm;
+	this(string[string] modules, string[] save){
+		this.modules = modules;
+		this.save = save;
 	}
 
 	override LdOBJECT opCall(HEAP _heap){
-		import_module(im, fm, _heap);
-		return new LdNone();
+		import_module(modules, save, &_heap);
+		return RETURN.A;
 	}
 }
 
+class Ifrom: LdByte {
+	string fpath;
+	string[] order;
+	string[string] attrs;
+
+	this(string f, string[string] a, string[] o){
+		this.fpath = f;
+		this.attrs = a;
+		this.order = o;
+	}
+
+	override LdOBJECT opCall(HEAP _heap){
+		import_library(fpath, &attrs, &order, &_heap);
+		return RETURN.A;
+	}
+}
