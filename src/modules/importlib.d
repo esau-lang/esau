@@ -46,13 +46,8 @@ HEAP imported_modules, _runtimeModules;
 
 LdModule[][string] Circular;
 
-enum _StartHeap {
-	A = [
-		"#rtd": new LdTrue(),
-		"#rt": new LdNone(),
-		"#bk": new LdTrue(),
-	]
-}
+LdOBJECT[string] _StartHeap;
+
 
 const string[] _Core = ["base64", "byte", "console", "dict", "dtypes", "file", "flare", "json", "list", "math", "path", "random", "socket", "str", "sys", "time"];
 
@@ -92,6 +87,12 @@ LdOBJECT import_core_library(string X){
 
 
 LdOBJECT[string] __setImp__(string[] args) {
+
+	_StartHeap = [
+		"#rtd": new LdTrue(),
+		"#rt": new LdNone(),
+		"#bk": new LdTrue(),
+	];
 
 	_runtimeModules = [ "": new LdStr("") ];
 
@@ -322,7 +323,7 @@ LdOBJECT read_dir_module(string[] htap){
 			return imported_modules[pack];
 
 		if(circular(pack)) {
-			mod = new LdModule(htap[0], pack, new _Interpreter(new _GenInter(new _Parse(new _Lex(readText(pack)).TOKENS, pack).ast).bytez, _StartHeap.A.dup).heap);
+			mod = new LdModule(htap[0], pack, new _Interpreter(new _GenInter(new _Parse(new _Lex(readText(pack)).TOKENS, pack).ast).bytez, _StartHeap.dup).heap);
 
 			cache(pack, mod);
 			return mod;
@@ -350,7 +351,7 @@ LdOBJECT read_file_module(string[2] htap){
 		return imported_modules[htap[1]];
 	
 	if(circular(htap[1])) {
-		mod = new LdModule(htap[0], htap[1], new _Interpreter(new _GenInter(new _Parse(new _Lex(readText(htap[1])).TOKENS, htap[1]).ast).bytez, _StartHeap.A.dup).heap);
+		mod = new LdModule(htap[0], htap[1], new _Interpreter(new _GenInter(new _Parse(new _Lex(readText(htap[1])).TOKENS, htap[1]).ast).bytez, _StartHeap.dup).heap);
 
 		cache(htap[1], mod);
 		return mod;

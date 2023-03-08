@@ -222,14 +222,26 @@ class _difftime: LdOBJECT
 class _ctime: LdOBJECT
 {
     override LdOBJECT opCall(LdOBJECT[] args){
-        long tm;
+        version(Windows) {
+            int tm;
 
-        if(args.length)
-            tm = cast(long)args[0].__num__;
-        else
-            tm = time(null);
+            if(args.length)
+                tm = cast(int)args[0].__num__;
+            else
+                tm = time(null);
 
-        return new LdStr(chomp(to!string(ctime(&tm))));
+            return new LdStr(chomp(to!string(ctime(&tm))));
+            
+        } else {
+            long tm;
+
+            if(args.length)
+                tm = cast(long)args[0].__num__;
+            else
+                tm = time(null);
+
+            return new LdStr(chomp(to!string(ctime(&tm))));
+        }
     }
 
     override string __str__() { return "ctime (time method)"; }

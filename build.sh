@@ -6,7 +6,7 @@
 # ldc2 -release -O --Oz --O5 --DRT-gcopt=profile:2\
 # ldc2\
 # ldc2 -release -O --Oz --O5 --DRT-gcopt=profile:2 -vgc\
-ldc2\
+dmd -release -O\
 	src/esau.d\
 	\
 	\

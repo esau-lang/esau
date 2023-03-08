@@ -1,6 +1,6 @@
-import str
 
-x = str.encode("\xf0\x9f\x98\xad")
+x = 0
 
-print(x)
-
+while (x < 10)
+    print(x)
+    x = x + 1

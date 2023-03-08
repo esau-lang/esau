@@ -332,8 +332,6 @@ class WebSocket {
 
         string json_data = cast(string)decoded;
         Js(json_data);
-        
-        //send(cast(char[])decoded);
 	}
 }
 

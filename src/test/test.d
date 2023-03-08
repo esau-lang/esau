@@ -1,11 +1,10 @@
 import std.stdio;
-import std.json;
-import std.format;
-import std.base64;
+import std.string;
+
 
 void main(){
-    string u = "\b[0-9][0-9]?/[0-9][0-9]?/[0-9][0-9](?:[0-9][0-9])?\b";
+    string u = readln();
 
-    writeln(u);
+    writeln(strip(u));
 }
 
